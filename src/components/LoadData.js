@@ -15,7 +15,7 @@ function LoadData() {
           className="page-header"
           textAlign="center"
         >
-          <Typography variant="h6">Load Data</Typography>
+          <Typography variant="h7">Load Data</Typography>
         </Grid>
       </Grid>
     </div>

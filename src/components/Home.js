@@ -56,7 +56,7 @@ function Home() {
   const [loadData, setLoad] = useState(false);
 
   const { height } = useWindowDimensions();
-  const divHeight = height - 200;
+  const divHeight = height - 175;
 
   const handleLocation = (values) => {
     setSLocations(values);
@@ -79,7 +79,7 @@ function Home() {
   };
 
   return (
-    <div style={{ margin: '0px 50px' }}>
+    <div style={{ margin: '0px 30px 10px 50px' }}>
       <Grid container spacing={2}>
         <Grid
           item
@@ -91,7 +91,7 @@ function Home() {
           className="page-header"
           textAlign="center"
         >
-          <Typography variant="h6">Room Avalibility</Typography>
+          <Typography variant="h7">Room Avalibility</Typography>
         </Grid>
         <Grid item xs={12} md={12} lg={12} mt={2}>
           <Grid container spacing={3}>
@@ -100,14 +100,14 @@ function Home() {
                 className="common-border"
                 container
                 spacing={2}
-                style={{ paddingLeft: '0px' }}
+                style={{ paddingLeft: '0px', fontSize: '12px' }}
               >
                 <Grid
                   item
                   xs={12}
                   style={{ maxHeight: divHeight, overflow: 'auto' }}
                 >
-                  <Grid container spacing={1.5}>
+                  <Grid container spacing={0.5}>
                     <Grid item xs={6}>
                       <LocalizationProvider dateAdapter={AdapterDateFns}>
                         <DatePicker
@@ -149,7 +149,7 @@ function Home() {
                     </Grid>
                     <Grid item xs={12}>
                       <Typography variant="h7">Start Week</Typography>
-                      <Box>
+                      <Box style={{ paddingLeft: '5px' }}>
                         <FormGroup row>
                           {weeks.map((week) => (
                             <FormControlLabel
@@ -162,7 +162,7 @@ function Home() {
                     </Grid>
                     <Grid item xs={12}>
                       <Typography variant="h7">Start Session</Typography>
-                      <Box>
+                      <Box style={{ paddingLeft: '5px' }}>
                         <FormGroup row>
                           {sessions.map((session) => (
                             <FormControlLabel
@@ -224,9 +224,13 @@ function Home() {
               xs={12}
               md={9}
               lg={9}
-              style={{ paddingTop: '10px', minHeight: divHeight + 57 }}
+              style={{
+                paddingTop: '10px',
+                minHeight: divHeight + 50,
+                paddingLeft: '10px',
+              }}
             >
-              <Grid container spacing={2} style={{ height: '100%' }}>
+              <Grid container spacing={0} style={{ height: '100%' }}>
                 <Grid item xs={12}>
                   {loadData ? <Data></Data> : <Spinner></Spinner>}
                 </Grid>

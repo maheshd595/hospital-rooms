@@ -133,7 +133,7 @@ const ResponsiveAppBar = () => {
             noWrap
             component="div"
             sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}
-            style={{ fontSize: '1.1rem' }}
+            style={{ fontSize: '1rem' }}
           >
             {isAuthenticated ? 'Hello, ' + isAuthenticated.username : ''}
           </Typography>

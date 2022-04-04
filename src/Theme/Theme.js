@@ -64,7 +64,7 @@ const theme = createTheme({
         {
           props: { variant: 'menu' },
           style: {
-            fontSize: '1rem',
+            fontSize: '0.9rem',
             color: 'white',
             margin: 0,
             backgroundColor: '#583095',
@@ -73,7 +73,7 @@ const theme = createTheme({
               color: 'white',
             },
             '&:disabled': {
-              fontSize: '1rem',
+              fontSize: '0.9rem',
               color: '#583095',
               backgroundColor: 'white',
             },

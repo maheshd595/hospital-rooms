@@ -15,7 +15,7 @@ function Reports() {
           className="page-header"
           textAlign="center"
         >
-          <Typography variant="h6">Assign Provider</Typography>
+          <Typography variant="h7">Assign Provider</Typography>
         </Grid>
       </Grid>
     </div>

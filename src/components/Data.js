@@ -3,11 +3,11 @@ import { DataGrid } from '@mui/x-data-grid';
 import '../styles/Data.css';
 
 const columns = [
-  { field: 'room', headerName: 'Room', width: 90 },
+  { field: 'room', headerName: 'Room', width: 100 },
   {
     field: 'type',
     headerName: 'Type',
-    width: 150,
+    width: 120,
   },
   {
     field: 'location',
@@ -17,28 +17,27 @@ const columns = [
   {
     field: 'start_date',
     headerName: 'Start Date',
-    width: 160,
+    width: 100,
   },
   {
     field: 'end_date',
     headerName: 'End Date',
-    width: 160,
+    width: 100,
   },
   {
     field: 'session',
     headerName: 'Session',
-    width: 100,
+    width: 80,
   },
   {
     field: 'sutie',
     headerName: 'Sutie',
-    type: 'number',
-    width: 110,
+    width: 80,
   },
   {
     field: 'provider',
     headerName: 'Provider',
-    width: 160,
+    width: 120,
   },
   {
     field: 'status',
