@@ -44,15 +44,15 @@
 .common-border {
   border: 1px solid var(--brand-color) !important;
 }
-.css-12wnr2w-MuiButtonBase-root-MuiCheckbox-root.Mui-checked {
+.MuiButtonBase-root.Mui-checked {
   color: var(--brand-color) !important;
 }
 
-.css-1yq5fb3-MuiButtonBase-root-MuiIconButton-root {
+.MuiButtonBase-root.MuiIconButton-root {
   color: var(--brand-color) !important;
 }
 
-.css-137kux4-MuiInputBase-root-MuiOutlinedInput-root.Mui-focused
+.MuiInputBase-root.MuiOutlinedInput-root.Mui-focused
   .MuiOutlinedInput-notchedOutline {
   border-color: var(--brand-color) !important;
 }
@@ -68,23 +68,23 @@ legend > span {
     0px 4px 5px 0px rgb(0 0 0 / 14%), 0px 1px 10px 0px rgb(0 0 0 / 12%);
 }
 
-.css-nxo287-MuiInputBase-input-MuiOutlinedInput-input {
+.MuiInputBase-input.MuiOutlinedInput-input {
   padding: 10px 0px 10px 10px !important;
   font-size: 14px !important;
 }
 
-.css-1yq5fb3-MuiButtonBase-root-MuiIconButton-root {
+.MuiButtonBase-root.MuiIconButton-root {
   padding: 5px !important;
 }
 
-.css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input {
+.MuiSelect-select.MuiInputBase-input.MuiOutlinedInput-input {
   padding: 10px 10px 0 10px !important;
   height: 40px !important;
 }
 
-.css-12wnr2w-MuiButtonBase-root-MuiCheckbox-root {
+.MuiButtonBase-root.MuiCheckbox-root {
   padding: 5px !important;
 }
-.css-1rfj0m-MuiTypography-root {
+.MuiTypography-root.MuiFormControlLabel-label {
   font-size: 14px !important;
 }
