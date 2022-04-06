@@ -142,10 +142,12 @@ const ResponsiveAppBar = () => {
               onClick={handleLogout}
               variant="outlined"
               color="white"
-              style={{ float: 'right' }}
+              style={{ float: 'right', minWidth: '30px' }}
               endIcon={<ExitToAppIcon />}
             >
-              {isAuthenticated ? 'Logout' : ''}
+              <Typography sx={{ display: { xs: 'none', sm: 'block' } }}>
+                {isAuthenticated ? 'Logout ' : ''}
+              </Typography>
             </Button>
           </Box>
         </Toolbar>
