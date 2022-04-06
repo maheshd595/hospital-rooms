@@ -1,18 +1,14 @@
 import * as React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
+import PropTypes from 'prop-types';
 import '../styles/Data.css';
 
 const columns = [
-  { field: 'room', headerName: 'Room', width: 100 },
-  {
-    field: 'type',
-    headerName: 'Type',
-    width: 120,
-  },
+  { field: 'room', headerName: 'Room', width: 120 },
   {
     field: 'location',
     headerName: 'Location',
-    width: 110,
+    width: 120,
   },
   {
     field: 'start_date',
@@ -25,14 +21,19 @@ const columns = [
     width: 100,
   },
   {
+    field: 'week',
+    headerName: 'Week',
+    width: 100,
+  },
+  {
     field: 'session',
     headerName: 'Session',
     width: 80,
   },
   {
-    field: 'sutie',
-    headerName: 'Sutie',
-    width: 80,
+    field: 'suite',
+    headerName: 'Suite',
+    width: 100,
   },
   {
     field: 'provider',
@@ -46,8 +47,7 @@ const columns = [
   },
 ];
 
-function getData() {
-  const data = require('./data.json');
+function getData(data) {
   var count = 0;
   data.map((item) => {
     item['id'] = count;
@@ -56,8 +56,13 @@ function getData() {
   return data;
 }
 
-export default function Data() {
-  const data = getData();
+export default function Data(props) {
+  const [tableData, setTableData] = React.useState([]);
+  const { data } = props;
+  React.useEffect(() => {
+    const loadData = getData(data);
+    setTableData(loadData);
+  }, [data]);
   return (
     <div
       style={{
@@ -66,7 +71,7 @@ export default function Data() {
     >
       <DataGrid
         className="common-border"
-        rows={data}
+        rows={tableData}
         columns={columns}
         pageSize={50}
         rowsPerPageOptions={[5]}
@@ -75,3 +80,7 @@ export default function Data() {
     </div>
   );
 }
+
+Data.propTypes = {
+  data: PropTypes.any,
+};

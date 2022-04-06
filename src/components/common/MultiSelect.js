@@ -29,10 +29,22 @@ function getStyles(name, personName, theme) {
   };
 }
 
-export default function MultiSelect(props) {
+function MultiSelect(props, ref) {
   const { label, items, handleSelection } = props;
   const theme = useTheme();
   const [values, setValues] = React.useState([]);
+
+  React.useEffect(() => {}, []);
+
+  React.useImperativeHandle(
+    ref,
+    () => ({
+      setFromOutside() {
+        setValues([]);
+      },
+    }),
+    []
+  );
 
   const handleChange = (event) => {
     const {
@@ -98,3 +110,5 @@ MultiSelect.propTypes = {
   items: PropTypes.any,
   handleSelection: PropTypes.func,
 };
+
+export default React.forwardRef(MultiSelect);
