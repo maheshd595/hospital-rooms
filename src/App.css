@@ -48,7 +48,11 @@
   color: var(--brand-color) !important;
 }
 
-.MuiButtonBase-root.MuiIconButton-root {
+/* .MuiButtonBase-root.MuiIconButton-root > svg.MuiSvgIcon-root {
+  color: var(--brand-color) !important;
+} */
+
+.MuiDialogActions-root.MuiDialogActions-spacing > button {
   color: var(--brand-color) !important;
 }
 

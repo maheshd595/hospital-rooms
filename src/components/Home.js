@@ -121,8 +121,8 @@ function Home() {
 
   const handleSubmit = () => {
     const data = require('./data.json');
-    const startDate = format(sDate ? sDate : new Date(), 'dd-MM-yyyy');
-    const endDate = format(eDate ? eDate : new Date(), 'dd-MM-yyyy');
+    const startDate = format(sDate ? sDate : new Date(), 'MM-dd-yyyy');
+    const endDate = format(eDate ? eDate : new Date(), 'MM-dd-yyyy');
     const filterData = data.filter(function (item) {
       if (item.start_date < startDate || item.start_date > endDate) {
         return false;
@@ -213,11 +213,14 @@ function Home() {
                 >
                   <Grid container spacing={0.5}>
                     <Grid item xs={6}>
-                      <LocalizationProvider dateAdapter={AdapterDateFns}>
+                      <LocalizationProvider
+                        className="date_Picker"
+                        dateAdapter={AdapterDateFns}
+                      >
                         <DatePicker
                           label="Start Date"
                           value={sDate}
-                          inputFormat="dd-MM-yyyy"
+                          inputFormat="MM-dd-yyyy"
                           onChange={(newValue) => {
                             setSDate(newValue);
                             setEDate(newValue);
@@ -235,12 +238,12 @@ function Home() {
                       <LocalizationProvider
                         dateAdapter={AdapterDateFns}
                         style={{ width: '350px' }}
+                        className="date_Picker"
                       >
                         <DatePicker
                           label="End Date"
                           value={eDate}
-                          inputFormat="dd-MM-yyyy"
-                          format="dd-MM-yyyy"
+                          inputFormat="MM-dd-yyyy"
                           onChange={(newValue) => {
                             setEDate(newValue);
                           }}
