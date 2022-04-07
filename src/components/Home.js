@@ -19,38 +19,43 @@ import Spinner from './common/DefaultSpinner';
 import { format } from 'date-fns';
 const d_weeks = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 const d_sessions = ['AM', 'Noon', 'Evening'];
-const d_locations = [
-  { name: 'Loc1', value: 1 },
-  { name: 'Loc2', value: 2 },
-  { name: 'Loc3', value: 3 },
-  { name: 'Loc4', value: 4 },
-  { name: 'Loc5', value: 5 },
-];
-const d_rooms = [
-  { name: 'Room1', value: 1 },
-  { name: 'Room2', value: 2 },
-  { name: 'Room3', value: 3 },
-  { name: 'Room4', value: 4 },
-  { name: 'Room5', value: 5 },
-];
-const d_suites = [
-  { name: 'Suite1', value: 1 },
-  { name: 'Suite2', value: 2 },
-  { name: 'Suite3', value: 3 },
-  { name: 'Suite4', value: 4 },
-  { name: 'Suite5', value: 5 },
-];
+// const d_locations = [
+//   { name: 'Loc1', value: 1 },
+//   { name: 'Loc2', value: 2 },
+//   { name: 'Loc3', value: 3 },
+//   { name: 'Loc4', value: 4 },
+//   { name: 'Loc5', value: 5 },
+// ];
+// const d_rooms = [
+//   { name: 'Room1', value: 1 },
+//   { name: 'Room2', value: 2 },
+//   { name: 'Room3', value: 3 },
+//   { name: 'Room4', value: 4 },
+//   { name: 'Room5', value: 5 },
+// ];
+// const d_suites = [
+//   { name: 'Suite1', value: 1 },
+//   { name: 'Suite2', value: 2 },
+//   { name: 'Suite3', value: 3 },
+//   { name: 'Suite4', value: 4 },
+//   { name: 'Suite5', value: 5 },
+// ];
 
-const d_providers = [
-  { name: 'Provider1', value: 1 },
-  { name: 'Provider2', value: 2 },
-  { name: 'Provider3', value: 3 },
-  { name: 'Provider4', value: 4 },
-  { name: 'Provider5', value: 5 },
-];
+// const d_providers = [
+//   { name: 'Provider1', value: 1 },
+//   { name: 'Provider2', value: 2 },
+//   { name: 'Provider3', value: 3 },
+//   { name: 'Provider4', value: 4 },
+//   { name: 'Provider5', value: 5 },
+// ];
 function Home() {
-  const [sDate, setSDate] = useState();
-  const [eDate, setEDate] = useState();
+  const [dLocations, setDLocations] = useState([]);
+  const [dRooms, setDRooms] = useState([]);
+  const [dSuites, setDSuites] = useState([]);
+  const [dProviders, setDProviders] = useState([]);
+
+  const [sDate, setSDate] = useState(null);
+  const [eDate, setEDate] = useState(null);
   const [weeks, setWeeks] = useState([]);
   const [sessions, setSessions] = useState([]);
   const [locations, setLocations] = useState([]);
@@ -66,7 +71,46 @@ function Home() {
 
   React.useEffect(() => {
     handleSubmit();
+    loadDropdownData();
   }, []);
+
+  const loadDropdownData = () => {
+    const data = require('./data.json');
+    const locs = [];
+    const suites = [];
+    const provs = [];
+    const rooms = [];
+    data.forEach((obj) => {
+      if (!locs.includes(obj.location)) {
+        locs.push(obj.location);
+      }
+      if (!suites.includes(obj.suite)) {
+        suites.push(obj.suite);
+      }
+      if (!provs.includes(obj.provider)) {
+        provs.push(obj.provider);
+      }
+      if (!rooms.includes(obj.room)) {
+        rooms.push(obj.room);
+      }
+    });
+    setDLocations(prepareData(locs));
+    setDSuites(prepareData(suites));
+    setDProviders(prepareData(provs));
+    setDRooms(prepareData(rooms));
+  };
+
+  const prepareData = (data) => {
+    var returnVal = [];
+    var count = 1;
+    data.forEach((obj) => {
+      returnVal.push({ name: obj, value: count });
+      count++;
+    });
+    return returnVal;
+  };
+
+  const handleStartDate = async () => {};
 
   const handleWeeks = (e) => {
     const { id, checked } = e.target;
@@ -124,12 +168,14 @@ function Home() {
     const startDate = format(sDate ? sDate : new Date(), 'MM-dd-yyyy');
     const endDate = format(eDate ? eDate : new Date(), 'MM-dd-yyyy');
     const filterData = data.filter(function (item) {
-      if (item.start_date < startDate || item.start_date > endDate) {
-        return false;
-      }
+      if (sDate != null && eDate != null) {
+        if (item.start_date < startDate || item.start_date > endDate) {
+          return false;
+        }
 
-      if (item.end_date < startDate || item.end_date > endDate) {
-        return false;
+        if (item.end_date < startDate || item.end_date > endDate) {
+          return false;
+        }
       }
 
       if (weeks && weeks.length > 0) {
@@ -150,7 +196,7 @@ function Home() {
       if (
         locations.length > 0 &&
         !locations.includes(
-          d_locations.find((obj) => obj.name === item.location)?.value
+          dLocations.find((obj) => obj.name === item.location)?.value
         )
       ) {
         return false;
@@ -158,21 +204,21 @@ function Home() {
       if (
         providers.length > 0 &&
         !providers.includes(
-          d_providers.find((obj) => obj.name === item.provider)?.value
+          dProviders.find((obj) => obj.name === item.provider)?.value
         )
       ) {
         return false;
       }
       if (
         suites.length > 0 &&
-        !suites.includes(d_suites.find((obj) => obj.name === item.suite)?.value)
+        !suites.includes(dSuites.find((obj) => obj.name === item.suite)?.value)
       ) {
         return false;
       }
 
       if (
         rooms.length > 0 &&
-        !rooms.includes(d_rooms.find((obj) => obj.name === item.room)?.value)
+        !rooms.includes(dRooms.find((obj) => obj.name === item.room)?.value)
       ) {
         return false;
       }
@@ -247,6 +293,9 @@ function Home() {
                           onChange={(newValue) => {
                             setEDate(newValue);
                           }}
+                          onError={() => {
+                            setEDate(null);
+                          }}
                           minDate={sDate}
                           renderInput={(params) => (
                             <TextField
@@ -292,7 +341,7 @@ function Home() {
                     <Grid item xs={12}>
                       <MultiSelect
                         label="Location"
-                        items={d_locations}
+                        items={dLocations}
                         ref={cref}
                         handleSelection={handleLocation}
                       ></MultiSelect>
@@ -300,21 +349,21 @@ function Home() {
                     <Grid item xs={12}>
                       <MultiSelect
                         label="Rooms"
-                        items={d_rooms}
+                        items={dRooms}
                         handleSelection={handleRooms}
                       ></MultiSelect>
                     </Grid>
                     <Grid item xs={12}>
                       <MultiSelect
                         label="Suites"
-                        items={d_suites}
+                        items={dSuites}
                         handleSelection={handleSuites}
                       ></MultiSelect>
                     </Grid>
                     <Grid item xs={12}>
                       <MultiSelect
                         label="Providers"
-                        items={d_providers}
+                        items={dProviders}
                         handleSelection={handleProviders}
                       ></MultiSelect>
                     </Grid>
