@@ -7,52 +7,39 @@ import {
   Grid,
   Typography,
 } from '@mui/material';
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import TextField from '@mui/material/TextField';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DatePicker from '@mui/lab/DatePicker';
-import MultiSelect from './common/MultiSelect';
 import Data from './Data';
 import useWindowDimensions from './common/useWindowDimensions';
 import Spinner from './common/DefaultSpinner';
-import { format } from 'date-fns';
+import AssignProviderDialog from './AssignProviderDialog';
+import helpService from '../services/helpService';
+import MultiselectDropDown from './common/MultiSelectDropDown';
+
 const d_weeks = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 const d_sessions = ['AM', 'Noon', 'Evening'];
-// const d_locations = [
-//   { name: 'Loc1', value: 1 },
-//   { name: 'Loc2', value: 2 },
-//   { name: 'Loc3', value: 3 },
-//   { name: 'Loc4', value: 4 },
-//   { name: 'Loc5', value: 5 },
-// ];
-// const d_rooms = [
-//   { name: 'Room1', value: 1 },
-//   { name: 'Room2', value: 2 },
-//   { name: 'Room3', value: 3 },
-//   { name: 'Room4', value: 4 },
-//   { name: 'Room5', value: 5 },
-// ];
-// const d_suites = [
-//   { name: 'Suite1', value: 1 },
-//   { name: 'Suite2', value: 2 },
-//   { name: 'Suite3', value: 3 },
-//   { name: 'Suite4', value: 4 },
-//   { name: 'Suite5', value: 5 },
-// ];
 
-// const d_providers = [
-//   { name: 'Provider1', value: 1 },
-//   { name: 'Provider2', value: 2 },
-//   { name: 'Provider3', value: 3 },
-//   { name: 'Provider4', value: 4 },
-//   { name: 'Provider5', value: 5 },
-// ];
 function Home() {
   const [dLocations, setDLocations] = useState([]);
   const [dRooms, setDRooms] = useState([]);
-  const [dSuites, setDSuites] = useState([]);
+  const [dRoomStatus, setDRoomStatus] = useState([]);
+  const [dRoomTypes, setDRoomTypes] = useState([]);
   const [dProviders, setDProviders] = useState([]);
+
+  const [filters, setFilters] = useState({
+    startDate: null,
+    endDate: null,
+    weeks: [],
+    sessions: [],
+    roomStatus: [],
+    roomTypes: [],
+    locations: [],
+    rooms: [],
+    providers: [],
+  });
 
   const [sDate, setSDate] = useState(null);
   const [eDate, setEDate] = useState(null);
@@ -60,11 +47,15 @@ function Home() {
   const [sessions, setSessions] = useState([]);
   const [locations, setLocations] = useState([]);
   const [rooms, setRooms] = useState([]);
-  const [suites, setSuites] = useState([]);
+  const [roomStatus, setRoomStatus] = useState([]);
+  const [roomTypes, setRoomTypes] = useState([]);
   const [providers, setProviders] = useState([]);
   const [filterData, setFilterData] = useState([]);
-  const [loadData, setLoad] = useState(false);
-  const cref = useRef();
+  const [loadData, setLoadData] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [assignRow, setAssignRow] = useState();
+  const [avilProviders, setAvilProviders] = useState([]);
+  const [optLoading, setOptLoading] = useState(false);
 
   const { height } = useWindowDimensions();
   const divHeight = height - 175;
@@ -74,43 +65,18 @@ function Home() {
     loadDropdownData();
   }, []);
 
-  const loadDropdownData = () => {
-    const data = require('./data.json');
-    const locs = [];
-    const suites = [];
-    const provs = [];
-    const rooms = [];
-    data.forEach((obj) => {
-      if (!locs.includes(obj.location)) {
-        locs.push(obj.location);
-      }
-      if (!suites.includes(obj.suite)) {
-        suites.push(obj.suite);
-      }
-      if (!provs.includes(obj.provider)) {
-        provs.push(obj.provider);
-      }
-      if (!rooms.includes(obj.room)) {
-        rooms.push(obj.room);
-      }
-    });
-    setDLocations(prepareData(locs));
-    setDSuites(prepareData(suites));
-    setDProviders(prepareData(provs));
-    setDRooms(prepareData(rooms));
-  };
+  const loadDropdownData = async () => {
+    setLoadData(false);
+    const types = await helpService.getRoomTypes();
+    setDRoomTypes(types);
 
-  const prepareData = (data) => {
-    var returnVal = [];
-    var count = 1;
-    data.forEach((obj) => {
-      returnVal.push({ name: obj, value: count });
-      count++;
-    });
-    return returnVal;
-  };
+    const status = await helpService.getRoomStatus();
+    setDRoomStatus(status);
 
-  const handleStartDate = async () => {};
+    const providers = await helpService.getAllProviders();
+    setDProviders(providers);
+    setLoadData(true);
+  };
 
   const handleWeeks = (e) => {
     const { id, checked } = e.target;
@@ -130,102 +96,121 @@ function Home() {
     }
   };
 
-  const handleLocation = (values) => {
-    setLocations(values);
+  const handleRoomStatus = (values) => {
+    setRoomStatus(values);
+  };
+
+  const handleRoomTypes = (values) => {
+    setRoomTypes(values);
+  };
+
+  const handleLocation = async (values) => {
+    await setLocations(values);
+    await updateRoomOnLocation(values);
+  };
+
+  const updateRoomOnLocation = async (values) => {
+    if (!values) {
+      return;
+    }
+    const filterRooms = [];
+    const allRooms = [];
+    console.log(' dLocations- ' + JSON.stringify(dLocations));
+    dLocations.forEach((location) => {
+      if (values.includes(location.value) && location.rooms.length > 0) {
+        location.rooms.forEach((a) => {
+          allRooms.push(a.value);
+        });
+      }
+    });
+
+    rooms.forEach((room) => {
+      allRooms.forEach((all) => {
+        if (all == room) {
+          filterRooms.push(room);
+        }
+      });
+    });
+
+    setRooms(filterRooms);
+    console.log('rooms: ' + dRooms);
+  };
+
+  const handleOpenLocation = async () => {
+    setOptLoading(dLocations?.length > 0 ? false : true);
+    const locs = await helpService.getLocations();
+    await setOptLoading(false);
+    await setDLocations(locs);
   };
 
   const handleRooms = (values) => {
     setRooms(values);
   };
 
-  const handleSuites = (values) => {
-    setSuites(values);
+  const handleOpenRooms = async () => {
+    var locationIds = '';
+    if (locations && locations != '') {
+      locationIds = locations.join(',');
+      const rooms = await helpService.getRoomsByLocationIds(locationIds);
+      setDRooms(rooms);
+    } else {
+      const rooms = await helpService.getAllRooms();
+      setDRooms(rooms);
+    }
   };
+
+  const handleByPrevent = () => {};
 
   const handleProviders = (values) => {
     setProviders(values);
   };
 
-  // const handleCancel = async () => {
-  //   await cref.current.setFromOutside();
-  //   await setSDate();
-  //   await setEDate();
-  //   await setWeeks([]);
-  //   await setSessions([]);
-  //   await setLocations([]);
-  //   await setRooms([]);
-  //   await setSuites([]);
-  //   await setProviders([]);
-  //   await handleSubmit();
-  //   setLoad(false);
-  //   const data = require('./data.json');
-  //   setFilterData(data);
-  //   setLoad(true);
-  // };
+  const handleSubmit = async () => {
+    const filterObj = {
+      startDate: sDate,
+      endDate: eDate,
+      weeks: weeks,
+      sessions: sessions,
+      roomStatus: roomStatus,
+      roomTypes: roomTypes,
+      locations: locations,
+      rooms: rooms,
+      providers: providers,
+    };
+    await setFilters(filterObj);
+    await setLoadData(false);
+    const assignedRooms = await helpService.getAllAssignedRooms(filterObj);
+    setFilterData(assignedRooms);
+    setLoadData(true);
+  };
 
-  const handleSubmit = () => {
-    const data = require('./data.json');
-    const startDate = format(sDate ? sDate : new Date(), 'MM-dd-yyyy');
-    const endDate = format(eDate ? eDate : new Date(), 'MM-dd-yyyy');
-    const filterData = data.filter(function (item) {
-      if (sDate != null && eDate != null) {
-        if (item.start_date < startDate || item.start_date > endDate) {
-          return false;
-        }
+  const openAssignProvider = async (row) => {
+    await getAvilableProviders(row);
+    setAssignRow(row);
+    setOpen(true);
+  };
 
-        if (item.end_date < startDate || item.end_date > endDate) {
-          return false;
-        }
-      }
+  const getAvilableProviders = async (assignRow) => {
+    if (assignRow) {
+      const data = await helpService.getAvilableProviders(
+        assignRow?.startDate,
+        assignRow?.session,
+        assignRow.providerId > 0 ? assignRow.providerId : 0
+      );
+      setAvilProviders(data);
+    }
+  };
 
-      if (weeks && weeks.length > 0) {
-        var exist = false;
+  const assignProvider = async (obj) => {
+    const assignProvider = { assignProvider: [obj] };
+    await helpService.assignProviderToRoom(assignProvider);
+    setOpen(false);
+    setLoadData(false);
+    handleSubmit();
+  };
 
-        item.week.split(',')?.map((val) => {
-          if (weeks.includes(val)) {
-            exist = true;
-            return;
-          }
-        });
-        if (!exist) return false;
-      }
-      if (sessions && sessions.length > 0 && !sessions.includes(item.session)) {
-        return false;
-      }
-
-      if (
-        locations.length > 0 &&
-        !locations.includes(
-          dLocations.find((obj) => obj.name === item.location)?.value
-        )
-      ) {
-        return false;
-      }
-      if (
-        providers.length > 0 &&
-        !providers.includes(
-          dProviders.find((obj) => obj.name === item.provider)?.value
-        )
-      ) {
-        return false;
-      }
-      if (
-        suites.length > 0 &&
-        !suites.includes(dSuites.find((obj) => obj.name === item.suite)?.value)
-      ) {
-        return false;
-      }
-
-      if (
-        rooms.length > 0 &&
-        !rooms.includes(dRooms.find((obj) => obj.name === item.room)?.value)
-      ) {
-        return false;
-      }
-      return true;
-    });
-    setFilterData(filterData);
-    setLoad(true);
+  const handleClose = () => {
+    setOpen(false);
   };
 
   return (
@@ -307,7 +292,7 @@ function Home() {
                       </LocalizationProvider>
                     </Grid>
                     <Grid item xs={12}>
-                      <Typography variant="h7">Start Week</Typography>
+                      <Typography variant="h7">Week:</Typography>
                       <Box style={{ paddingLeft: '5px' }}>
                         <FormGroup row>
                           {d_weeks.map((week) => (
@@ -322,7 +307,7 @@ function Home() {
                       </Box>
                     </Grid>
                     <Grid item xs={12}>
-                      <Typography variant="h7">Start Session</Typography>
+                      <Typography variant="h7">Session:</Typography>
                       <Box style={{ paddingLeft: '5px' }}>
                         <FormGroup row>
                           {d_sessions.map((session) => (
@@ -339,33 +324,50 @@ function Home() {
                       </Box>
                     </Grid>
                     <Grid item xs={12}>
-                      <MultiSelect
+                      <MultiselectDropDown
+                        label="Room Status"
+                        items={dRoomStatus}
+                        selectedOpts={roomStatus}
+                        handleSelection={handleRoomStatus}
+                        handleOpenSelect={handleByPrevent}
+                      ></MultiselectDropDown>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <MultiselectDropDown
+                        label="Room Type"
+                        items={dRoomTypes}
+                        selectedOpts={roomTypes}
+                        handleSelection={handleRoomTypes}
+                        handleOpenSelect={handleByPrevent}
+                      ></MultiselectDropDown>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <MultiselectDropDown
                         label="Location"
                         items={dLocations}
-                        ref={cref}
+                        selectedOpts={locations}
                         handleSelection={handleLocation}
-                      ></MultiSelect>
+                        handleOpenSelect={handleOpenLocation}
+                        loading={optLoading}
+                      ></MultiselectDropDown>
                     </Grid>
                     <Grid item xs={12}>
-                      <MultiSelect
+                      <MultiselectDropDown
                         label="Rooms"
                         items={dRooms}
+                        selectedOpts={rooms}
                         handleSelection={handleRooms}
-                      ></MultiSelect>
+                        handleOpenSelect={handleOpenRooms}
+                      ></MultiselectDropDown>
                     </Grid>
                     <Grid item xs={12}>
-                      <MultiSelect
-                        label="Suites"
-                        items={dSuites}
-                        handleSelection={handleSuites}
-                      ></MultiSelect>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <MultiSelect
+                      <MultiselectDropDown
                         label="Providers"
                         items={dProviders}
+                        selectedOpts={providers}
                         handleSelection={handleProviders}
-                      ></MultiSelect>
+                        handleOpenSelect={handleByPrevent}
+                      ></MultiselectDropDown>
                     </Grid>
                   </Grid>
                 </Grid>
@@ -373,12 +375,13 @@ function Home() {
                   item
                   xs={12}
                   textAlign="center"
-                  style={{ padding: '0px' }}
+                  style={{ padding: '0px', marginTop: '10px' }}
                 >
                   <Button
                     variant="submit"
                     style={{ width: '100%', borderRadius: '0px' }}
                     onClick={handleSubmit}
+                    disabled={!loadData || optLoading}
                   >
                     SUBMIT
                   </Button>
@@ -399,10 +402,20 @@ function Home() {
               <Grid container spacing={0} style={{ height: '100%' }}>
                 <Grid item xs={12}>
                   {loadData ? (
-                    <Data data={filterData}></Data>
+                    <Data
+                      data={filterData}
+                      openAssignProvider={openAssignProvider}
+                    ></Data>
                   ) : (
                     <Spinner></Spinner>
                   )}
+                  <AssignProviderDialog
+                    open={open}
+                    handleClose={handleClose}
+                    onAssign={assignProvider}
+                    assignRow={assignRow}
+                    items={avilProviders}
+                  ></AssignProviderDialog>
                 </Grid>
               </Grid>
             </Grid>

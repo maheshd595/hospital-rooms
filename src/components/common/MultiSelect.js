@@ -30,7 +30,8 @@ function getStyles(name, personName, theme) {
 }
 
 function MultiSelect(props, ref) {
-  const { label, items, handleSelection } = props;
+  const { label, items, handleSelection, handleOpenSelect, selectedOpts } =
+    props;
   const theme = useTheme();
   const [values, setValues] = React.useState([]);
 
@@ -61,6 +62,10 @@ function MultiSelect(props, ref) {
     handleSelection(items);
   };
 
+  const handleOpen = () => {
+    handleOpenSelect();
+  };
+
   return (
     <div>
       <FormControl
@@ -74,13 +79,14 @@ function MultiSelect(props, ref) {
           multiple
           value={values}
           onChange={handleChange}
+          onOpen={handleOpen}
           input={<OutlinedInput id="select-multiple-chip" label={label} />}
           renderValue={(selected) => (
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
               {selected.map((value) => (
                 <Chip
                   key={value}
-                  label={items.find((item) => item.value === value).name}
+                  label={items.find((item) => item.id === value).name}
                   onDelete={() => handleDelete(value)}
                   onMouseDown={(event) => {
                     event.stopPropagation();
@@ -94,7 +100,7 @@ function MultiSelect(props, ref) {
           {items.map((item) => (
             <MenuItem
               key={item.value}
-              value={item.value}
+              value={item.id}
               style={getStyles(item.name, values, theme)}
             >
               {item.name}
@@ -109,6 +115,8 @@ MultiSelect.propTypes = {
   label: PropTypes.string,
   items: PropTypes.any,
   handleSelection: PropTypes.func,
+  handleOpenSelect: PropTypes.func,
+  selectedOpts: PropTypes.any,
 };
 
 export default React.forwardRef(MultiSelect);

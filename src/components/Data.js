@@ -2,67 +2,66 @@ import * as React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import PropTypes from 'prop-types';
 import '../styles/Data.css';
-
-const columns = [
-  { field: 'room', headerName: 'Room', width: 120 },
-  {
-    field: 'location',
-    headerName: 'Location',
-    width: 120,
-  },
-  {
-    field: 'start_date',
-    headerName: 'Start Date',
-    width: 100,
-  },
-  {
-    field: 'end_date',
-    headerName: 'End Date',
-    width: 100,
-  },
-  {
-    field: 'week',
-    headerName: 'Week',
-    width: 100,
-  },
-  {
-    field: 'session',
-    headerName: 'Session',
-    width: 80,
-  },
-  {
-    field: 'suite',
-    headerName: 'Suite',
-    width: 100,
-  },
-  {
-    field: 'provider',
-    headerName: 'Provider',
-    width: 120,
-  },
-  {
-    field: 'status',
-    headerName: 'Status',
-    width: 100,
-  },
-];
-
-function getData(data) {
-  var count = 0;
-  data.map((item) => {
-    item['id'] = count;
-    count++;
-  });
-  return data;
-}
+import { Button } from '@mui/material';
 
 export default function Data(props) {
   const [tableData, setTableData] = React.useState([]);
-  const { data } = props;
+  const { data, openAssignProvider } = props;
+
   React.useEffect(() => {
-    const loadData = getData(data);
-    setTableData(loadData);
+    setTableData(data);
   }, [data]);
+
+  const columns = [
+    { field: 'roomName', headerName: 'Room', width: 100 },
+    { field: 'roomType', headerName: 'Room Type', width: 120 },
+    { field: 'status', headerName: 'Room Status', width: 100 },
+    {
+      field: 'location',
+      headerName: 'Location',
+      width: 100,
+    },
+    {
+      field: 'startDateStr',
+      headerName: 'Start Date',
+      width: 100,
+    },
+    {
+      field: 'endDateStr',
+      headerName: 'End Date',
+      width: 100,
+    },
+    {
+      field: 'session',
+      headerName: 'Session',
+      width: 80,
+    },
+    {
+      field: 'provider',
+      headerName: 'Provider',
+      width: 150,
+    },
+    {
+      field: 'action ',
+      headerName: 'Action',
+      sortable: false,
+      renderCell: (params) => {
+        return (
+          <>
+            <Button
+              className={params.row.provider ? 'bookedRoom' : 'openRoom'}
+              variant="action-button"
+              onClick={() => openAssignProvider(params.row)}
+              disabled={params.row.status === 'Deleted'}
+            >
+              {params.row.provider ? 'Edit' : 'Assign'}
+            </Button>
+          </>
+        );
+      },
+    },
+  ];
+
   return (
     <div
       style={{
@@ -76,6 +75,7 @@ export default function Data(props) {
         pageSize={50}
         rowsPerPageOptions={[5]}
         disableSelectionOnClick
+        disableColumnMenu="true"
       />
     </div>
   );
@@ -83,4 +83,5 @@ export default function Data(props) {
 
 Data.propTypes = {
   data: PropTypes.any,
+  openAssignProvider: PropTypes.func,
 };

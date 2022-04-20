@@ -19,8 +19,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 const pages = [
   { name: 'Home', path: '/home' },
-  { name: 'Assign Provider', path: '/assign' },
-  { name: 'Load Data', path: '/data' },
+  { name: 'Manage Rooms', path: '/assign' },
 ];
 
 const ResponsiveAppBar = () => {
@@ -135,7 +134,7 @@ const ResponsiveAppBar = () => {
             sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}
             style={{ fontSize: '1rem' }}
           >
-            {isAuthenticated ? 'Hello, ' + isAuthenticated.username : ''}
+            {isAuthenticated ? 'Hello, ' + isAuthenticated.name : ''}
           </Typography>
           <Box sx={{ flexGrow: 0 }}>
             <Button

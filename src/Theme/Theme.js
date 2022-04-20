@@ -62,6 +62,24 @@ const theme = createTheme({
           },
         },
         {
+          props: { variant: 'action-button' },
+          style: {
+            fontSize: '0.7rem',
+            color: 'white',
+            margin: 0,
+            backgroundColor: '#583095',
+            '&:hover': {
+              backgroundColor: '#44296e',
+              color: 'white',
+            },
+            '&:disabled': {
+              color: '#00000042 !important',
+              fontSize: '0.7rem',
+              backgroundColor: '#0000001f !important',
+            },
+          },
+        },
+        {
           props: { variant: 'menu' },
           style: {
             fontSize: '0.9rem',

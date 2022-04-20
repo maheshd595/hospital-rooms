@@ -13,12 +13,7 @@ import {
 import CustomInput from './CustomInput';
 import { setItemToLocalStorage } from '../services/storageService';
 import PropTypes from 'prop-types';
-
-const myDetails = {
-  username: 'mahesh',
-  password: 'mahesh',
-  isAdmin: false,
-};
+import helpService from '../services/helpService';
 
 export const Auth = (props) => {
   const { handleLogin } = props;
@@ -38,20 +33,22 @@ export const Auth = (props) => {
     setFormData(newFormData);
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const checkAuth = async (userName, password) => {
+    const data = await helpService.auth(userName, password);
+    return data;
+  };
 
-    const isInvalidCredential =
-      formData.username !== myDetails.username ||
-      formData.password !== myDetails.password;
-    if (isInvalidCredential) return setError(true);
-    else {
-      setItemToLocalStorage('user', myDetails);
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const authUser = await checkAuth(formData.username, formData.password);
+
+    if (authUser?.authenticated) {
+      setItemToLocalStorage('user', authUser.user);
 
       toast.success('Successfully logged In!');
       handleLogin();
       navigate('/home');
-    }
+    } else return setError(true);
   };
 
   return (
