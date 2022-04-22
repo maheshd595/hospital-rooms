@@ -28,10 +28,8 @@ const getAllProviders = async () => {
   return data;
 };
 
-const getAvilableProviders = async (date, session, provider) => {
-  const { data } = await httpService.get(
-    `/filter/providers/date/${date}/session/${session}/provider/${provider}`
-  );
+const getAvilableProviders = async (assignedRoomVO) => {
+  const { data } = await httpService.post('/filter/providers', assignedRoomVO);
   return data;
 };
 

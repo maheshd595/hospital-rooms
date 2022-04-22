@@ -3,23 +3,27 @@ import { DataGrid } from '@mui/x-data-grid';
 import PropTypes from 'prop-types';
 import '../styles/Data.css';
 import { Button } from '@mui/material';
+import { getItemFromLocalStorage } from '../services/storageService';
 
 export default function Data(props) {
   const [tableData, setTableData] = React.useState([]);
   const { data, openAssignProvider } = props;
+
+  const loginUser = getItemFromLocalStorage('user');
 
   React.useEffect(() => {
     setTableData(data);
   }, [data]);
 
   const columns = [
-    { field: 'roomName', headerName: 'Room', width: 100 },
-    { field: 'roomType', headerName: 'Room Type', width: 120 },
-    { field: 'status', headerName: 'Room Status', width: 100 },
+    { field: 'roomName', headerName: 'Room', minWidth: 100, flex: 1 },
+    { field: 'roomType', headerName: 'Room Type', minWidth: 100, flex: 1 },
+    { field: 'status', headerName: 'Status', width: 120 },
     {
       field: 'location',
       headerName: 'Location',
-      width: 100,
+      minWidth: 100,
+      flex: 1,
     },
     {
       field: 'startDateStr',
@@ -39,23 +43,29 @@ export default function Data(props) {
     {
       field: 'provider',
       headerName: 'Provider',
-      width: 150,
+      minWidth: 150,
+      flex: 1,
     },
     {
       field: 'action ',
       headerName: 'Action',
+      hide: loginUser?.userRole.role != 'ADMIN',
       sortable: false,
       renderCell: (params) => {
         return (
           <>
-            <Button
-              className={params.row.provider ? 'bookedRoom' : 'openRoom'}
-              variant="action-button"
-              onClick={() => openAssignProvider(params.row)}
-              disabled={params.row.status === 'Deleted'}
-            >
-              {params.row.provider ? 'Edit' : 'Assign'}
-            </Button>
+            {loginUser?.userRole.role === 'ADMIN' ? (
+              <Button
+                className={params.row.provider ? 'bookedRoom' : 'openRoom'}
+                variant="action-button"
+                onClick={() => openAssignProvider(params.row)}
+                disabled={params.row.status === 'Deleted'}
+              >
+                {params.row.provider ? 'Edit' : 'Assign'}
+              </Button>
+            ) : (
+              ''
+            )}
           </>
         );
       },

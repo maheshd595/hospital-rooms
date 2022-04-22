@@ -30,6 +30,7 @@ function Home() {
   const [dProviders, setDProviders] = useState([]);
 
   const [filters, setFilters] = useState({
+    showByDay: false,
     startDate: null,
     endDate: null,
     weeks: [],
@@ -41,6 +42,7 @@ function Home() {
     providers: [],
   });
 
+  const [showByDay, setShowByDay] = useState(false);
   const [sDate, setSDate] = useState(null);
   const [eDate, setEDate] = useState(null);
   const [weeks, setWeeks] = useState([]);
@@ -94,6 +96,29 @@ function Home() {
     } else {
       setSessions(sessions.filter((item) => item !== id));
     }
+  };
+
+  const handleShowByDay = async (event) => {
+    await setShowByDay(event.target.checked);
+    const filterObj = {
+      showByDay: event.target.checked,
+      startDate: sDate,
+      endDate: eDate,
+      weeks: weeks,
+      sessions: sessions,
+      roomStatus: roomStatus,
+      roomTypes: roomTypes,
+      locations: locations,
+      rooms: rooms,
+      providers: providers,
+    };
+    await setFilters(filterObj);
+    await setLoadData(false);
+    const assignedRooms = await helpService.getAllAssignedRooms(filterObj);
+
+    const data = await addDynamicId(assignedRooms);
+    setFilterData(data);
+    setLoadData(true);
   };
 
   const handleRoomStatus = (values) => {
@@ -167,6 +192,7 @@ function Home() {
 
   const handleSubmit = async () => {
     const filterObj = {
+      showByDay: showByDay,
       startDate: sDate,
       endDate: eDate,
       weeks: weeks,
@@ -180,9 +206,25 @@ function Home() {
     await setFilters(filterObj);
     await setLoadData(false);
     const assignedRooms = await helpService.getAllAssignedRooms(filterObj);
-    setFilterData(assignedRooms);
+
+    const data = await addDynamicId(assignedRooms);
+    setFilterData(data);
     setLoadData(true);
   };
+
+  function addDynamicId(dataArr) {
+    var count = 1;
+
+    if (dataArr?.length > 0) {
+      dataArr.map(function (item) {
+        item.id = count;
+
+        count++;
+      });
+      return dataArr;
+    }
+    return [];
+  }
 
   const openAssignProvider = async (row) => {
     await getAvilableProviders(row);
@@ -192,18 +234,15 @@ function Home() {
 
   const getAvilableProviders = async (assignRow) => {
     if (assignRow) {
-      const data = await helpService.getAvilableProviders(
-        assignRow?.startDate,
-        assignRow?.session,
-        assignRow.providerId > 0 ? assignRow.providerId : 0
-      );
+      console.log('aa' + JSON.stringify(assignRow));
+      const data = await helpService.getAvilableProviders(assignRow);
       setAvilProviders(data);
     }
   };
 
-  const assignProvider = async (obj) => {
-    const assignProvider = { assignProvider: [obj] };
-    await helpService.assignProviderToRoom(assignProvider);
+  const assignProvider = async (provider, assignedRoom) => {
+    assignedRoom.providerId = provider;
+    await helpService.assignProviderToRoom(assignedRoom);
     setOpen(false);
     setLoadData(false);
     handleSubmit();
@@ -227,6 +266,19 @@ function Home() {
           textAlign="center"
         >
           <Typography variant="h7">Room Avalibility</Typography>
+
+          <span
+            style={{ float: 'right', fontWeight: 400, fontSize: '12px' }}
+            className="header-checkbox"
+          >
+            <FormControlLabel
+              style={{ fontSize: '1.2rem !important' }}
+              control={<Checkbox id="daywise" />}
+              label="Show By Day"
+              checked={showByDay}
+              onClick={handleShowByDay}
+            />
+          </span>
         </Grid>
         <Grid item xs={12} md={12} lg={12} mt={2}>
           <Grid container spacing={3}>
@@ -396,7 +448,7 @@ function Home() {
               style={{
                 paddingTop: '10px',
                 minHeight: divHeight + 50,
-                paddingLeft: '10px',
+                paddingLeft: '8px',
               }}
             >
               <Grid container spacing={0} style={{ height: '100%' }}>

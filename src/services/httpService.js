@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 import axios from 'axios';
 
-const client = axios.create({ baseURL: 'http://localhost:5000/' });
+const client = axios.create({ baseURL: 'http://192.168.29.86:5000/' });
 
 export default {
   get: client.get,

@@ -90,6 +90,16 @@ legend > span {
 .MuiButtonBase-root.MuiCheckbox-root {
   padding: 5px !important;
 }
+
+span > label > .MuiButtonBase-root.MuiCheckbox-root {
+  padding: 0px !important;
+  margin-right: 5px !important;
+}
+
+span > label > .MuiButtonBase-root.MuiCheckbox-root > svg {
+  font-size: 1.3rem !important;
+}
+
 .MuiTypography-root.MuiFormControlLabel-label {
   font-size: 14px !important;
 }
@@ -104,6 +114,10 @@ legend > span {
 
 .MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated.MuiFormLabel-root {
   top: -7px !important;
+}
+
+.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated.MuiInputLabel-shrink.MuiFormLabel-root {
+  top: 0px !important;
 }
 
 .openRoom {

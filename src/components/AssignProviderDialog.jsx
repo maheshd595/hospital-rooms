@@ -19,23 +19,25 @@ const AssignProviderDialog = (props) => {
 
   React.useEffect(() => {
     setSelectedValueToProvider();
-    const { items, open, onAssign, handleClose, assignRow } = props;
   }, [items, assignRow]);
 
   const setSelectedValueToProvider = async () => {
     if (assignRow) {
-      setValue({ id: assignRow.id, providerId: assignRow.providerId });
+      setValue(assignRow.providerId);
       const val = items.find((item) => item.value === assignRow?.providerId);
       await setSelectedValue(val);
     }
   };
 
   const handleChange = (values) => {
-    setValue({ id: assignRow.id, providerId: values.value });
+    setValue(values.value);
+    const val = items.find((item) => item.value === values.value);
+
+    setSelectedValue(val);
   };
 
   const handleRemove = () => {
-    onAssign({ id: assignRow.id, providerId: 0 });
+    onAssign(0, assignRow);
   };
 
   return (
@@ -73,8 +75,9 @@ const AssignProviderDialog = (props) => {
                 <Button
                   className="openRoom"
                   variant="action-button"
-                  onClick={() => onAssign(value)}
+                  onClick={() => onAssign(value, assignRow)}
                   style={{ marginLeft: '5px' }}
+                  disabled={value === assignRow?.providerId}
                 >
                   Assign
                 </Button>
